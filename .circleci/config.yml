@@ -1,76 +1,41 @@
-version: 2
+version: 2.1
 
 jobs:
-
-  test-ruby-2.3:
+  build:
+    parameters:
+      image:
+        description: "Name of the docker image (e.g. circleci/ruby:2.5"
+        type: string
+      command:
+        description: "The command to execute (e.g. bundle exec rspec)"
+        type: string
     docker:
-      - image: circleci/ruby:2.3
+      - image: << parameters.image >>
     steps:
       - checkout
       - run: bundle lock --update
       - restore_cache:
           keys:
-            - v2-ruby-2-3-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+            - v1-<< parameters.image >>-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
       - run: bundle install --path vendor/cache
       - save_cache:
           paths:
             - vendor/cache
-          key: v2-ruby-2-3-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rspec spec
-
-  test-ruby-2.4:
-    docker:
-      - image: circleci/ruby:2.4
-    steps:
-      - checkout
-      - run: bundle lock --update
-      - restore_cache:
-          keys:
-            - v2-ruby-2-4-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle install --path vendor/cache
-      - save_cache:
-          paths:
-            - vendor/cache
-          key: v2-ruby-2-4-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rspec spec
-
-  test-ruby-2.5:
-    docker:
-      - image: circleci/ruby:2.5
-    steps:
-      - checkout
-      - run: bundle lock --update
-      - restore_cache:
-          keys:
-            - v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle install --path vendor/cache
-      - save_cache:
-          paths:
-            - vendor/cache
-          key: v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rspec spec
-
-  rubocop:
-    docker:
-      - image: circleci/ruby:2.5
-    steps:
-      - checkout
-      - run: bundle lock --update
-      - restore_cache:
-          keys:
-            - v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle install --path vendor/cache
-      - save_cache:
-          paths:
-            - vendor/cache
-          key: v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rubocop
+          key: v1-<< parameters.image >>-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: << parameters.command >>
 
 workflows:
-  version: 2
   build:
     jobs:
-      - test-ruby-2.3
-      - test-ruby-2.4
-      - test-ruby-2.5
-      - rubocop
+      - build:
+          image: circleci/ruby:2.3
+          command: bundle exec rspec spec
+      - build:
+          image: circleci/ruby:2.4
+          command: bundle exec rspec spec
+      - build:
+          image: circleci/ruby:2.5
+          command: bundle exec rspec spec
+      - build:
+          image: circleci/ruby:2.5
+          command: bundle exec rubocop
