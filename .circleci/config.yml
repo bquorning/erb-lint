@@ -1,0 +1,76 @@
+version: 2
+
+jobs:
+
+  test-ruby-2.3:
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+      - run: bundle lock --update
+      - restore_cache:
+          keys:
+            - v2-ruby-2-3-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/cache
+      - save_cache:
+          paths:
+            - vendor/cache
+          key: v2-ruby-2-3-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle exec rspec spec
+
+  test-ruby-2.4:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - run: bundle lock --update
+      - restore_cache:
+          keys:
+            - v2-ruby-2-4-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/cache
+      - save_cache:
+          paths:
+            - vendor/cache
+          key: v2-ruby-2-4-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle exec rspec spec
+
+  test-ruby-2.5:
+    docker:
+      - image: circleci/ruby:2.5
+    steps:
+      - checkout
+      - run: bundle lock --update
+      - restore_cache:
+          keys:
+            - v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/cache
+      - save_cache:
+          paths:
+            - vendor/cache
+          key: v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle exec rspec spec
+
+  rubocop:
+    docker:
+      - image: circleci/ruby:2.5
+    steps:
+      - checkout
+      - run: bundle lock --update
+      - restore_cache:
+          keys:
+            - v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/cache
+      - save_cache:
+          paths:
+            - vendor/cache
+          key: v2-ruby-2-5-gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+      - run: bundle exec rubocop
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test-ruby-2.3
+      - test-ruby-2.4
+      - test-ruby-2.5
+      - rubocop
