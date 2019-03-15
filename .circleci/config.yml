@@ -30,12 +30,16 @@ workflows:
       - build:
           image: circleci/ruby:2.3
           command: bundle exec rspec spec
+          name: 2.3 RSpec
       - build:
           image: circleci/ruby:2.4
           command: bundle exec rspec spec
+          name: 2.4 RSpec
       - build:
           image: circleci/ruby:2.5
           command: bundle exec rspec spec
+          name: 2.5 RSpec
       - build:
-          image: circleci/ruby:2.5
+          image: circleci/ruby
           command: bundle exec rubocop
+          name: RuboCop
